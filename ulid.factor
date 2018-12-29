@@ -1,6 +1,8 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar kernel math namespaces random sequences system ;
+USING: ascii binary-search calendar kernel make math
+math.bitwise math.order namespaces random sequences splitting
+summary system ;
 
 IN: ulid
 
@@ -27,6 +29,18 @@ SYMBOL: last-random-bits
     nano-count 1000 /i dup \ same-msec? get =
     [ drop t ] [ \ same-msec? set f ] if ;
 
+: pack-bits ( seq -- seq' )
+    5 swap [ first ] [ rest ] bi [
+        [ ! can-take-bits overflow-byte elt
+            pick 5 >= [
+                swap 5 shift bitor swap 5 - [ , 0 8 ] when-zero swap
+            ] [
+                3dup rot [ shift ] [ 5 - shift ] bi-curry bi* bitor ,
+                nip 5 rot - [ bits 8 ] keep - swap
+            ] if
+        ] each 2drop
+    ] B{ } make ;
+
 PRIVATE>
 
 ERROR: ulid-overflow ;
@@ -39,3 +53,29 @@ ERROR: ulid-overflow ;
         now encode-time dup last-time-string set
         80 random-bits
     ] if dup last-random-bits set encode-random-bits append ;
+
+ERROR: ulid>bytes-bad-length n ;
+M: ulid>bytes-bad-length summary drop "Invalid ULID length" ;
+
+ERROR: ulid>bytes-bad-character ch ;
+M: ulid>bytes-bad-character summary drop "Invalid character in ULID" ;
+
+ERROR: ulid>bytes-overflow ;
+M: ulid>bytes-overflow summary drop "Overflow error in ULID" ;
+
+: ulid>bytes ( ulid -- byte-array )
+    dup length dup 26 = [ drop ] [ ulid>bytes-bad-length ] if
+    [
+        dup [ >=< ] curry encoding swap search pick =
+        [ nip ] [ drop ulid>bytes-bad-character ] if
+    ] B{ } map-as dup first 7 > [ ulid>bytes-overflow ] when pack-bits ;
+
+: normalize-ulid ( str -- str' )
+    >upper "I" "1" replace "L" "1" replace "O" "0" replace ;
+
+ERROR: bytes>ulid-bad-length n ;
+M: bytes>ulid-bad-length summary drop "Invalid byte-array length for ULID" ;
+
+: bytes>ulid ( byte-array -- ulid )
+    dup length dup 16 = [ drop ] [ bytes>ulid-bad-length ] if
+    [ rest ] [ first ] bi [ swap 8 shift + ] reduce 26 encode-bits ;
