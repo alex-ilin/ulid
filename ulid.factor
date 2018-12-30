@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ascii binary-search calendar kernel make math
 math.bitwise math.order namespaces random sequences splitting
-summary system ;
+summary system tr ;
 
 IN: ulid
 
@@ -41,6 +41,8 @@ SYMBOL: last-random-bits
         ] each 2drop
     ] B{ } make ;
 
+TR: (normalize-ulid) "ILO" "110" ; inline
+
 PRIVATE>
 
 ERROR: ulid-overflow ;
@@ -71,7 +73,7 @@ M: ulid>bytes-overflow summary drop "Overflow error in ULID" ;
     ] B{ } map-as dup first 7 > [ ulid>bytes-overflow ] when pack-bits ;
 
 : normalize-ulid ( str -- str' )
-    >upper "I" "1" replace "L" "1" replace "O" "0" replace ;
+    >upper (normalize-ulid) ;
 
 ERROR: bytes>ulid-bad-length n ;
 M: bytes>ulid-bad-length summary drop "Invalid byte-array length for ULID" ;
