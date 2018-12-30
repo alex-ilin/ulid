@@ -75,7 +75,7 @@ M: ulid>bytes-overflow summary drop "Overflow error in ULID" ;
     >upper (normalize-ulid) ;
 
 ERROR: bytes>ulid-bad-length n ;
-M: bytes>ulid-bad-length summary drop "Invalid byte-array length for ULID" ;
+M: bytes>ulid-bad-length summary drop "Invalid ULID byte-array length" ;
 
 : bytes>ulid ( byte-array -- ulid )
     dup length dup 16 = [ drop ] [ bytes>ulid-bad-length ] if
