@@ -16,8 +16,7 @@ SYMBOL: last-time-string
 SYMBOL: last-random-bits
 
 : encode-bits ( n chars -- string )
-    <iota> [ drop base /mod encoding nth ] "" collector-as [ each ] dip
-    nip reverse! ;
+    [ base /mod encoding nth ] "" replicate-as nip reverse! ;
 
 : encode-random-bits ( n -- string )
     16 encode-bits ;
