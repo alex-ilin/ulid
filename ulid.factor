@@ -1,4 +1,4 @@
-! Copyright (C) 2018 Alexander Ilin.
+! Copyright (C) 2018, 2019 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ascii binary-search calendar io.binary kernel make math
 math.bitwise math.order namespaces random sequences splitting
