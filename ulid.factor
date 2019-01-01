@@ -10,7 +10,7 @@ IN: ulid
 
 CONSTANT: encoding "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 CONSTANT: base 32
-CONSTANT: 64-bits 0xFFFFFFFFFFFFFFFF
+CONSTANT: 80-bits 0xFFFFFFFFFFFFFFFFFFFF
 
 SYMBOL: last-time-string
 SYMBOL: last-random-bits
@@ -49,7 +49,7 @@ ERROR: ulid-overflow ;
 : ulid ( -- ulid )
     same-msec? [
         last-time-string get last-random-bits get 1 +
-        dup 64-bits > [ ulid-overflow ] when
+        dup 80-bits > [ ulid-overflow ] when
     ] [
         now encode-time dup last-time-string set
         80 random-bits
