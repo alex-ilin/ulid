@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Alexander Ilin.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii binary-search calendar kernel make math
+USING: ascii binary-search calendar io.binary kernel make math
 math.bitwise math.order namespaces random sequences splitting
 summary system tr ;
 
@@ -83,4 +83,4 @@ M: bytes>ulid-bad-length summary drop "Invalid ULID byte-array length" ;
 
 : bytes>ulid ( byte-array -- ulid )
     dup length dup 16 = [ drop ] [ bytes>ulid-bad-length ] if
-    [ rest ] [ first ] bi [ swap 8 shift + ] reduce 26 encode-bits ;
+    be> 26 encode-bits ;
