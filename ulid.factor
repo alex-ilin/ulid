@@ -7,6 +7,7 @@ summary system tr ;
 IN: ulid
 
 ERROR: ulid-overflow ;
+M: ulid-overflow summary drop "Too many ULIDs generated per msec" ;
 
 <PRIVATE
 
