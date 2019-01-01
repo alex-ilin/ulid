@@ -6,6 +6,8 @@ summary system tr ;
 
 IN: ulid
 
+ERROR: ulid-overflow ;
+
 <PRIVATE
 
 CONSTANT: encoding "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
@@ -42,18 +44,19 @@ SYMBOL: last-random-bits
 
 TR: (normalize-ulid) "ILO" "110" ; inline
 
-PRIVATE>
-
-ERROR: ulid-overflow ;
-
-: ulid ( -- ulid )
-    same-msec? [
+: (ulid) ( same-msec? -- ulid )
+    [
         last-time-string get last-random-bits get 1 +
         dup 80-bits > [ ulid-overflow ] when
     ] [
         now encode-time dup last-time-string set
         80 random-bits
     ] if dup last-random-bits set encode-random-bits append ;
+
+PRIVATE>
+
+: ulid ( -- ulid )
+    same-msec? (ulid) ;
 
 ERROR: ulid>bytes-bad-length n ;
 M: ulid>bytes-bad-length summary drop "Invalid ULID length" ;
